@@ -4,6 +4,7 @@ import { RateSelector } from './components/RateSelector';
 import { TimeInputs } from './components/TimeInputs';
 import { CalculationResult } from './components/CalculationResult';
 import { CalculationHistory } from './components/CalculationHistory';
+import { PWAInstallPrompt } from './components/PWAInstallPrompt';
 import { useLocalStorage } from './hooks/useLocalStorage';
 import { calculateRentalCost } from './utils/calculations';
 import { HourlyRate } from './data/rateChart';
@@ -186,6 +187,9 @@ function App() {
 
       {/* Bottom spacing for navigation */}
       <div className="h-24"></div>
+
+      {/* PWA Install Prompt */}
+      <PWAInstallPrompt />
     </div>
   );
 }
