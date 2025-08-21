@@ -42,10 +42,10 @@ export const PWAInstallPrompt: React.FC = () => {
   if (!showPrompt) return null;
 
   return (
-    <div className="fixed bottom-24 left-4 right-4 z-50 bg-white/95 backdrop-blur-md rounded-2xl shadow-2xl border border-gray-200/50 p-4 animate-in slide-in-from-bottom-4">
+    <div className="fixed bottom-24 left-4 right-4 z-50 bg-white rounded-2xl shadow-lg border border-gray-200 p-4">
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-3">
-          <div className="bg-gradient-to-br from-green-500 to-green-600 p-2 rounded-xl">
+          <div className="bg-green-600 p-2 rounded-xl">
             <Download size={20} className="text-white" />
           </div>
           <div>
@@ -64,7 +64,7 @@ export const PWAInstallPrompt: React.FC = () => {
       <div className="mt-3 flex space-x-2">
         <button
           onClick={handleInstall}
-          className="flex-1 bg-gradient-to-r from-green-600 to-green-700 text-white font-semibold py-2 px-4 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 active:scale-95"
+          className="flex-1 bg-green-600 text-white font-semibold py-2 px-4 rounded-xl shadow-lg hover:bg-green-700 transition-all duration-200"
         >
           Install
         </button>
