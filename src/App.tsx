@@ -160,9 +160,9 @@ function App() {
                 ? 'bg-green-100 shadow-lg' 
                 : 'hover:bg-gray-100'
             }`}>
-              <Calculator size={22} />
+              <Calculator size={22} className="relative z-20" />
             </div>
-            <span className="text-xs mt-1 font-medium">Calculator</span>
+            <span className="text-xs mt-1 font-medium relative z-20">Calculator</span>
           </button>
           
           <button
@@ -178,9 +178,9 @@ function App() {
                 ? 'bg-green-100 shadow-lg' 
                 : 'hover:bg-gray-100'
             }`}>
-              <History size={22} />
+              <History size={22} className="relative z-20" />
             </div>
-            <span className="text-xs mt-1 font-medium">History</span>
+            <span className="text-xs mt-1 font-medium relative z-20">History</span>
           </button>
         </div>
       </div>

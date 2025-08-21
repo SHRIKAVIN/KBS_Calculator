@@ -10,15 +10,19 @@
  * - Your calculator image (PNG format recommended)
  * 
  * Usage:
- * 1. Install sharp: npm install -g sharp
+ * 1. Install sharp: npm install sharp
  * 2. Place your calculator image in the public/ folder as 'calculator-icon.png'
  * 3. Run: node scripts/generate-icons.js
  * 4. Icons will be generated in the public/ folder
  */
 
-const sharp = require('sharp');
-const fs = require('fs');
-const path = require('path');
+import sharp from 'sharp';
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const iconSizes = [
   { name: 'icon-192x192.png', size: 192 },
@@ -64,10 +68,9 @@ async function generateIcons() {
 
 // Check if sharp is available
 try {
-  require('sharp');
   generateIcons();
 } catch (error) {
   console.log('❌ Sharp package not found');
-  console.log('📦 Install it with: npm install -g sharp');
+  console.log('📦 Install it with: npm install sharp');
   console.log('🔧 Or run: npm install sharp');
 }
