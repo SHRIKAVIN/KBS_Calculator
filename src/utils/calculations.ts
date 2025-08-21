@@ -18,9 +18,14 @@ export function calculateRentalCost(
 }
 
 export function formatCurrency(amount: number): string {
-  return new Intl.NumberFormat('en-IN', {
-    style: 'currency',
-    currency: 'INR',
-    minimumFractionDigits: 2
-  }).format(amount);
+  try {
+    return new Intl.NumberFormat('en-IN', {
+      style: 'currency',
+      currency: 'INR',
+      minimumFractionDigits: 2
+    }).format(amount);
+  } catch (error) {
+    // Fallback to simple formatting if Intl is not supported
+    return `₹${amount.toLocaleString()}`;
+  }
 }

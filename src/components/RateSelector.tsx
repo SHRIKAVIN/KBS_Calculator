@@ -26,7 +26,7 @@ export const RateSelector: React.FC<RateSelectorProps> = ({ selectedRate, onRate
           >
             {hourlyRateOptions.map((rate) => (
               <option key={rate} value={rate}>
-                ₹{rate.toLocaleString()}.00
+                ₹{rate.toLocaleString()}
               </option>
             ))}
           </select>
