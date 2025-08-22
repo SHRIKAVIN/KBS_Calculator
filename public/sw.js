@@ -1,19 +1,24 @@
-const CACHE_NAME = 'kbs-calculator-v1';
+const CACHE_NAME = 'kbs-calculator-v2';
+const STATIC_CACHE = 'kbs-calculator-static-v2';
+const DYNAMIC_CACHE = 'kbs-calculator-dynamic-v2';
+
 const urlsToCache = [
   '/',
   '/index.html',
+  '/offline.html',
   '/manifest.json',
   '/icon-192x192.png',
   '/icon-512x512.png',
-  '/apple-touch-icon.png'
+  '/apple-touch-icon.png',
+  '/calculator-icon.png'
 ];
 
-// Install event - cache resources
+// Install event - cache static resources
 self.addEventListener('install', (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME)
+    caches.open(STATIC_CACHE)
       .then((cache) => {
-        console.log('Opened cache');
+        console.log('Opened static cache');
         return cache.addAll(urlsToCache);
       })
   );
@@ -21,16 +26,73 @@ self.addEventListener('install', (event) => {
 
 // Fetch event - serve from cache when offline
 self.addEventListener('fetch', (event) => {
-  // Skip service worker for asset files (let Vite handle them)
-  if (event.request.url.includes('/assets/')) {
+  const { request } = event;
+  
+  // Handle different types of requests
+  if (request.method !== 'GET') {
     return;
   }
-  
+
+  // For HTML requests, try network first, then cache
+  if (request.destination === 'document') {
+    event.respondWith(
+      fetch(request)
+        .then((response) => {
+          // Clone the response before caching
+          const responseClone = response.clone();
+          caches.open(DYNAMIC_CACHE).then((cache) => {
+            cache.put(request, responseClone);
+          });
+          return response;
+        })
+        .catch(() => {
+          // Return offline page if main page fails
+          if (request.url.endsWith('/') || request.url.endsWith('/index.html')) {
+            return caches.match('/offline.html');
+          }
+          return caches.match(request);
+        })
+    );
+    return;
+  }
+
+  // For CSS, JS, and other assets, try cache first, then network
+  if (request.destination === 'script' || 
+      request.destination === 'style' || 
+      request.destination === 'image') {
+    event.respondWith(
+      caches.match(request)
+        .then((response) => {
+          if (response) {
+            return response;
+          }
+          return fetch(request)
+            .then((fetchResponse) => {
+              // Cache the fetched response
+              const responseClone = fetchResponse.clone();
+              caches.open(DYNAMIC_CACHE).then((cache) => {
+                cache.put(request, responseClone);
+              });
+              return fetchResponse;
+            });
+        })
+    );
+    return;
+  }
+
+  // For API calls and other requests, try network first, then cache
   event.respondWith(
-    caches.match(event.request)
+    fetch(request)
       .then((response) => {
-        // Return cached version or fetch from network
-        return response || fetch(event.request);
+        // Clone the response before caching
+        const responseClone = response.clone();
+        caches.open(DYNAMIC_CACHE).then((cache) => {
+          cache.put(request, responseClone);
+        });
+        return response;
+      })
+      .catch(() => {
+        return caches.match(request);
       })
   );
 });
@@ -41,7 +103,7 @@ self.addEventListener('activate', (event) => {
     caches.keys().then((cacheNames) => {
       return Promise.all(
         cacheNames.map((cacheName) => {
-          if (cacheName !== CACHE_NAME) {
+          if (cacheName !== STATIC_CACHE && cacheName !== DYNAMIC_CACHE) {
             console.log('Deleting old cache:', cacheName);
             return caches.delete(cacheName);
           }
@@ -50,3 +112,15 @@ self.addEventListener('activate', (event) => {
     })
   );
 });
+
+// Background sync for offline actions
+self.addEventListener('sync', (event) => {
+  if (event.tag === 'background-sync') {
+    event.waitUntil(doBackgroundSync());
+  }
+});
+
+async function doBackgroundSync() {
+  // Handle any background sync operations
+  console.log('Background sync triggered');
+}

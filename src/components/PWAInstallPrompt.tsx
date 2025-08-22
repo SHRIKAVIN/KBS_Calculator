@@ -1,11 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import { Download, X } from 'lucide-react';
+import { Download, X, CheckCircle } from 'lucide-react';
+import { isPWAInstalled, isPWAInstallable } from '../utils/pwa';
 
 export const PWAInstallPrompt: React.FC = () => {
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
   const [showPrompt, setShowPrompt] = useState(false);
+  const [isInstalled, setIsInstalled] = useState(false);
+  const [canInstall, setCanInstall] = useState(false);
 
   useEffect(() => {
+    // Check if PWA is already installed
+    setIsInstalled(isPWAInstalled());
+    setCanInstall(isPWAInstallable());
+
     const handler = (e: Event) => {
       e.preventDefault();
       setDeferredPrompt(e);
@@ -38,6 +45,9 @@ export const PWAInstallPrompt: React.FC = () => {
   const handleDismiss = () => {
     setShowPrompt(false);
   };
+
+  // Don't show if already installed or can't install
+  if (isInstalled || !canInstall) return null;
 
   if (!showPrompt) return null;
 
