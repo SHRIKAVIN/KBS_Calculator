@@ -133,7 +133,7 @@ function App() {
       </div>
 
       {/* Bottom Navigation */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-lg">
+      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-lg z-50">
         <div className="max-w-md mx-auto flex">
           <button
             onClick={() => setActiveTab('calculator')}
@@ -143,14 +143,14 @@ function App() {
                 : 'text-gray-500 hover:text-gray-700'
             }`}
           >
-            <div className={`p-2 rounded-xl ${
+            <div className={`p-2 rounded-xl mb-1 ${
               activeTab === 'calculator' 
                 ? 'bg-green-100' 
                 : 'hover:bg-gray-100'
             }`}>
               <Calculator size={22} />
             </div>
-            <span className="text-xs mt-1 font-medium">Calculator</span>
+            <span className="text-xs font-medium">Calculator</span>
           </button>
           
           <button
@@ -161,14 +161,14 @@ function App() {
                 : 'text-gray-500 hover:text-gray-700'
             }`}
           >
-            <div className={`p-2 rounded-xl ${
+            <div className={`p-2 rounded-xl mb-1 ${
               activeTab === 'history' 
                 ? 'bg-green-100' 
                 : 'hover:bg-gray-100'
             }`}>
               <History size={22} />
             </div>
-            <span className="text-xs mt-1 font-medium">History</span>
+            <span className="text-xs font-medium">History</span>
           </button>
         </div>
       </div>
