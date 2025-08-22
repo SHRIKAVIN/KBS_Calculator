@@ -5,7 +5,7 @@ import { TimeInputs } from './components/TimeInputs';
 import { CalculationResult } from './components/CalculationResult';
 import { CalculationHistory } from './components/CalculationHistory';
 import { PWAInstallPrompt } from './components/PWAInstallPrompt';
-import { OfflineIndicator } from './components/OfflineIndicator';
+import { OfflineStatus } from './components/OfflineStatus';
 import { useLocalStorage } from './hooks/useLocalStorage';
 import { calculateRentalCost } from './utils/calculations';
 import { HourlyRate } from './data/rateChart';
@@ -55,8 +55,8 @@ function App() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Offline Indicator */}
-      <OfflineIndicator />
+      {/* Offline Status */}
+      <OfflineStatus />
       
       {/* Header */}
       <div className="bg-green-600">

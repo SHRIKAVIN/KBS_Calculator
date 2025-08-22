@@ -1,7 +1,8 @@
-const CACHE_NAME = 'kbs-calculator-v2';
-const STATIC_CACHE = 'kbs-calculator-static-v2';
-const DYNAMIC_CACHE = 'kbs-calculator-dynamic-v2';
+const CACHE_NAME = 'kbs-calculator-v3';
+const STATIC_CACHE = 'kbs-calculator-static-v3';
+const DYNAMIC_CACHE = 'kbs-calculator-dynamic-v3';
 
+// Cache ALL app assets immediately - no internet needed after first load
 const urlsToCache = [
   '/',
   '/index.html',
@@ -13,18 +14,52 @@ const urlsToCache = [
   '/calculator-icon.png'
 ];
 
-// Install event - cache static resources
+// Install event - cache ALL resources immediately
 self.addEventListener('install', (event) => {
+  console.log('Service Worker installing and caching all resources...');
+  
   event.waitUntil(
     caches.open(STATIC_CACHE)
       .then((cache) => {
-        console.log('Opened static cache');
+        console.log('Opened static cache, adding all resources...');
         return cache.addAll(urlsToCache);
+      })
+      .then(() => {
+        console.log('All static resources cached successfully!');
+        // Skip waiting to activate immediately
+        return self.skipWaiting();
+      })
+      .catch((error) => {
+        console.error('Failed to cache resources:', error);
       })
   );
 });
 
-// Fetch event - serve from cache when offline
+// Activate event - take control immediately and clean up old caches
+self.addEventListener('activate', (event) => {
+  console.log('Service Worker activating...');
+  
+  event.waitUntil(
+    Promise.all([
+      // Take control of all clients immediately
+      self.clients.claim(),
+      
+      // Clean up old caches
+      caches.keys().then((cacheNames) => {
+        return Promise.all(
+          cacheNames.map((cacheName) => {
+            if (cacheName !== STATIC_CACHE && cacheName !== DYNAMIC_CACHE) {
+              console.log('Deleting old cache:', cacheName);
+              return caches.delete(cacheName);
+            }
+          })
+        );
+      })
+    ])
+  );
+});
+
+// Fetch event - serve from cache FIRST, then network (offline-first strategy)
 self.addEventListener('fetch', (event) => {
   const { request } = event;
   
@@ -33,83 +68,39 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // For HTML requests, try network first, then cache
-  if (request.destination === 'document') {
-    event.respondWith(
-      fetch(request)
-        .then((response) => {
-          // Clone the response before caching
-          const responseClone = response.clone();
-          caches.open(DYNAMIC_CACHE).then((cache) => {
-            cache.put(request, responseClone);
-          });
-          return response;
-        })
-        .catch(() => {
-          // Return offline page if main page fails
-          if (request.url.endsWith('/') || request.url.endsWith('/index.html')) {
-            return caches.match('/offline.html');
-          }
-          return caches.match(request);
-        })
-    );
-    return;
-  }
-
-  // For CSS, JS, and other assets, try cache first, then network
-  if (request.destination === 'script' || 
-      request.destination === 'style' || 
-      request.destination === 'image') {
-    event.respondWith(
-      caches.match(request)
-        .then((response) => {
-          if (response) {
-            return response;
-          }
-          return fetch(request)
-            .then((fetchResponse) => {
-              // Cache the fetched response
+  // For ALL requests, try cache FIRST, then network (offline-first)
+  event.respondWith(
+    caches.match(request)
+      .then((cachedResponse) => {
+        if (cachedResponse) {
+          console.log('Serving from cache:', request.url);
+          return cachedResponse;
+        }
+        
+        // If not in cache, try network
+        return fetch(request)
+          .then((fetchResponse) => {
+            // Cache the fetched response for next time
+            if (fetchResponse && fetchResponse.status === 200) {
               const responseClone = fetchResponse.clone();
               caches.open(DYNAMIC_CACHE).then((cache) => {
                 cache.put(request, responseClone);
               });
-              return fetchResponse;
-            });
-        })
-    );
-    return;
-  }
-
-  // For API calls and other requests, try network first, then cache
-  event.respondWith(
-    fetch(request)
-      .then((response) => {
-        // Clone the response before caching
-        const responseClone = response.clone();
-        caches.open(DYNAMIC_CACHE).then((cache) => {
-          cache.put(request, responseClone);
-        });
-        return response;
+            }
+            return fetchResponse;
+          })
+          .catch((error) => {
+            console.log('Network failed, serving offline fallback:', request.url);
+            
+            // For HTML requests, return offline page
+            if (request.destination === 'document') {
+              return caches.match('/offline.html');
+            }
+            
+            // For other requests, return null (will show as broken image/link)
+            return null;
+          });
       })
-      .catch(() => {
-        return caches.match(request);
-      })
-  );
-});
-
-// Activate event - clean up old caches
-self.addEventListener('activate', (event) => {
-  event.waitUntil(
-    caches.keys().then((cacheNames) => {
-      return Promise.all(
-        cacheNames.map((cacheName) => {
-          if (cacheName !== STATIC_CACHE && cacheName !== DYNAMIC_CACHE) {
-            console.log('Deleting old cache:', cacheName);
-            return caches.delete(cacheName);
-          }
-        })
-      );
-    })
   );
 });
 
@@ -121,6 +112,20 @@ self.addEventListener('sync', (event) => {
 });
 
 async function doBackgroundSync() {
-  // Handle any background sync operations
   console.log('Background sync triggered');
+  // Handle any background sync operations
 }
+
+// Message event for cache management
+self.addEventListener('message', (event) => {
+  if (event.data && event.data.type === 'SKIP_WAITING') {
+    self.skipWaiting();
+  }
+  
+  if (event.data && event.data.type === 'GET_CACHE_INFO') {
+    event.ports[0].postMessage({
+      type: 'CACHE_INFO',
+      cacheNames: [STATIC_CACHE, DYNAMIC_CACHE]
+    });
+  }
+});
