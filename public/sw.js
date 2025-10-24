@@ -1,6 +1,6 @@
-const CACHE_NAME = 'kbs-calculator-v3';
-const STATIC_CACHE = 'kbs-calculator-static-v3';
-const DYNAMIC_CACHE = 'kbs-calculator-dynamic-v3';
+const CACHE_NAME = 'kbs-calculator-v4';
+const STATIC_CACHE = 'kbs-calculator-static-v4';
+const DYNAMIC_CACHE = 'kbs-calculator-dynamic-v4';
 
 // Cache ALL app assets immediately - no internet needed after first load
 const urlsToCache = [
