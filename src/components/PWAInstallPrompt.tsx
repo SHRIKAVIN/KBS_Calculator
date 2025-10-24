@@ -55,7 +55,7 @@ export const PWAInstallPrompt: React.FC = () => {
     <div className="fixed bottom-24 left-4 right-4 z-50 bg-white rounded-2xl shadow-lg border border-gray-200 p-4">
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-3">
-          <div className="bg-green-600 p-2 rounded-xl">
+          <div className="bg-blue-600 p-2 rounded-xl">
             <Download size={20} className="text-white" />
           </div>
           <div>
@@ -74,7 +74,7 @@ export const PWAInstallPrompt: React.FC = () => {
       <div className="mt-3 flex space-x-2">
         <button
           onClick={handleInstall}
-          className="flex-1 bg-green-600 text-white font-semibold py-2 px-4 rounded-xl shadow-lg hover:bg-green-700 transition-all duration-200"
+          className="flex-1 bg-blue-600 text-white font-semibold py-2 px-4 rounded-xl shadow-lg hover:bg-blue-700 transition-all duration-200"
         >
           Install
         </button>

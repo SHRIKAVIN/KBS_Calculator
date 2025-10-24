@@ -42,7 +42,7 @@ export const CalculationHistory: React.FC<CalculationHistoryProps> = ({
               <span className="font-medium text-gray-800">
                 ₹{item.hourlyRate.toLocaleString()}/hr • {item.hours}h {item.minutes}m
               </span>
-              <span className="font-bold text-green-700">
+              <span className="font-bold text-blue-700">
                 {formatCurrency(item.totalCost)}
               </span>
             </div>
