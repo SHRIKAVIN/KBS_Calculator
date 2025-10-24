@@ -11,7 +11,7 @@ const urlsToCache = [
   '/icon-192x192.png',
   '/icon-512x512.png',
   '/apple-touch-icon.png',
-  '/calculator-icon.png'
+  '/harvester.png'
 ];
 
 // Install event - cache ALL resources immediately
