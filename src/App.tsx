@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Calculator, History } from 'lucide-react';
 import { RateSelector } from './components/RateSelector';
 import { TimeInputs } from './components/TimeInputs';
@@ -18,6 +18,27 @@ function App() {
   const [result, setResult] = useState({ hoursCost: 0, minutesCost: 0, totalCost: 0 });
   const [history, setHistory] = useLocalStorage<HistoryType[]>('kbs-calculator-history', []);
   const [activeTab, setActiveTab] = useState<'calculator' | 'history'>('calculator');
+
+  // iOS Keyboard handling
+  useEffect(() => {
+    const handleResize = () => {
+      // Force viewport height recalculation on iOS
+      const vh = window.innerHeight * 0.01;
+      document.documentElement.style.setProperty('--vh', `${vh}px`);
+    };
+
+    // Initial call
+    handleResize();
+
+    // Listen for resize events (keyboard show/hide)
+    window.addEventListener('resize', handleResize);
+    window.addEventListener('orientationchange', handleResize);
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      window.removeEventListener('orientationchange', handleResize);
+    };
+  }, []);
 
   const handleCalculate = () => {
     const hoursNum = typeof hours === 'number' ? hours : 0;
@@ -172,7 +193,7 @@ function App() {
       </div>
 
       {/* Bottom Navigation */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-lg z-50">
+      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-lg z-50 safe-area-inset-bottom">
         <div className="max-w-md mx-auto flex">
           <button
             onClick={() => setActiveTab('calculator')}
